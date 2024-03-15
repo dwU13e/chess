@@ -15,7 +15,7 @@ btn.addEventListener('click', e => {
     eventStr = eventV.value
 })
 
-var dateString = `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDay()}`
+var dateString = `${date.getFullYear()}.${date.getMonth() + 1}.${date.getUTCDate()}`
 
 var whiteInput = document.createElement('input')
 whiteInput.placeholder = 'Who is white?'
@@ -66,7 +66,7 @@ var winString = ''
 
 var opt1 = document.createElement('button')
 var opt2 = document.createElement('button')
-var opt3 = document.createElement('button')
+var movesStr = '1. '
 
 
 btn5.addEventListener('click', i => {
@@ -77,25 +77,71 @@ btn5.addEventListener('click', i => {
     var bbtn2 = document.createElement('button')    
     bbtn1.innerText = 'Victory'
     bbtn2.innerText = 'Draw'
-    var bh2 = document.createElement('h2')
-    bh2.innerText = 'If victory, who won?'
-    opt1.innerText = 'White'
-    opt2.innerText = 'Black'
-    opt3.innerText = 'Draw'
-
+    var moveNum = 1
+    var iterationNum = 1
+    var isNum = true
+    for (var i = 0; i < moves.length; i++) {
+        if (iterationNum < 3) {
+            movesStr+= moves[i] + ' '
+            iterationNum++
+        } else {
+            i--
+            moveNum++
+            iterationNum = 1
+            movesStr += `${moveNum}. `
+        }
+    }
+    document.body.append(bh1,bbtn1,bbtn2)
+    bbtn1.addEventListener('click', e => {
+        document.body.innerHTML = ''
+        var ch1 = document.createElement('h1')
+        var cbtn1 = document.createElement('button')
+        var cbtn2 = document.createElement('button')
+        cbtn1.innerText = 'White'
+        cbtn2.innerText = 'Black'
+        ch1.innerText = 'Who won?'
+        document.body.append(ch1,cbtn1,cbtn2)
+        cbtn1.addEventListener('click', f => {
+            winString = '1-0'
+            makePgnFile()
+        })
+        cbtn2.addEventListener('click', f => {
+            winString = '0-1'
+            makePgnFile()
+        })
+    })
+    bbtn2.addEventListener('click', e => {
+        winString = '1/2-1/2'
+        makePgnFile()
+    })
+    
 })
 
 
-opt1.addEventListener('click', j => {
-    winString = '1-0'
-})
 
-opt2.addEventListener('click', k => {
-    winString = '0-1'
-})
+function makePgnFile() {
+    document.body.innerHTML = ''
+    pgnFile = `
+    [Event "${eventStr}"]
+    [Site "Sagle, Idaho"]
+    [Date "${dateString}"]
+    [Round "1"]
+    [White "${whiteString}"]
+    [Black "${blackString}"]
+    [Result "${winString}"]
 
-opt3.addEventListener('click', l => {
-    winString = '1/2-1/2'
-})
+    ${movesStr}
+`
 
-var movesStr = ''
+    var blob = new Blob(
+        [`${pgnFile}`],
+        {type: "text/plain"}
+    )
+
+    var url = window.URL.createObjectURL(blob)
+    var anchor = document.createElement('a')
+    anchor.href = url
+    anchor.innerText = 'Download Game'
+    anchor.download = 'game.pgn'
+    document.body.append(anchor)
+}
