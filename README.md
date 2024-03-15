@@ -1,2 +1,2 @@
-# main idea
-## input chess moves, logs all moves to last position
+# Welcome
+## Just made a new thing to help record the games I play!
